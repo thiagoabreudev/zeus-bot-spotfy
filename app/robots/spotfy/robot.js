@@ -1,17 +1,16 @@
-const express = require('express');
 const querystring = require('querystring');
-const request = require('request');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const spotfyClient = require('./spotfy-client');
+const api = require('./api');
 
 class Robot {
-  constructor(engineEvent) {
-    this.engineEvent = engineEvent;
-    this.app = express()
+  constructor(orchestrator, app) {
+    this.orchestrator = orchestrator;
+    this.app = app;
     this.stateKey = 'spotify_auth_state';
     this.access_token = null;
     this.refresh_token = null;
+    app.get('/login', this.loginWithoauthSpotfy);
+    app.get('/callback', this.callback);
+    console.log('[spotfy] online...');
   }
 
   generateRandomString(length) {
@@ -47,20 +46,10 @@ class Robot {
     const code = req.query.code || null;
     const oauthToken = this.getOauthToken();
     res.clearCookie(this.stateKey);
-    constApiToken = spotfyClient.getApiToken(code, oauthToken);
+    constApiToken = api.getApiToken(code, oauthToken);
     this.access_token = constApiToken.access_token;
     this.refresh_token = constApiToken.refresh_token;
     res.send('ok')
-  }
-
-  start() {
-    this.app.use(cors())
-      .use(cookieParser());
-    this.app.get('/login', this.loginWithoauthSpotfy);
-    this.app.get('/callback', this.callback);
-    this.app.listen(3000, () => {
-      console.log('Escutando na porta 3000')
-    })
   }
 
   getUrlToAuthenticate() {
@@ -71,7 +60,7 @@ class Robot {
 
   handler(parentSchema, schema) {
     console.log(schema)
-    console.log(spotfyClient.handler(schema))
+    console.log(api.handler(schema))
   }
 
   // handler(params) {
@@ -86,6 +75,6 @@ class Robot {
   // }
 }
 
-module.exports = (engineEvent) => {
-  return new Robot(engineEvent);
+module.exports = (orchestrator, app) => {
+  return new Robot(orchestrator, app);
 };

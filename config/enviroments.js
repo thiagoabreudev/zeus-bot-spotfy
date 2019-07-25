@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports = {
   API_HOST: process.env.API_HOST,
   SLACK_TOKEN: process.env.SLACK_TOKEN,
