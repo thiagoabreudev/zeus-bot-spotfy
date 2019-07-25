@@ -1,5 +1,5 @@
 const request = require('request');
-
+const qs = require('querystring')
 class SpotfyClient {
   constructor() { }
 
@@ -38,6 +38,17 @@ class SpotfyClient {
     request.get(options, (error, response, body) => {
       return body
     })
+  }
+
+  changeVolume(volumePercent, access_token) {
+    return true
+    // const query = {volume_percent: volumePercent}
+    // const options = {
+    //   url: `https://api.spotify.com/v1/me/player/volume${qs.parse(query)}`,
+    //   method: ' PUT',
+    //   headers: this.getAuthenticatedUser(access_token)
+    // }
+    // return request(options)
   }
 
   handler(schema, access_token) {
